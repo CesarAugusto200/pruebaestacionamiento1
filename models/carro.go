@@ -40,6 +40,9 @@ func (c *Carro) RunCarro() {
 
 	c.Estacionamiento.M.Lock()
 	fmt.Println("Carro ", c.I, " Sale")
+	if c.Estacionamiento.SlotsDisponibles == 0 {
+		<-c.Estacionamiento.SlotsEstacionamiento
+	}
 	c.Estacionamiento.SlotsDisponibles++
 	c.Estacionamiento.M.Unlock()
 }

@@ -8,7 +8,7 @@ import (
 
 func main() {
 	p := models.CreateEstacionamiento(3)
-	Poison.GenerateCarros(5, p)
+	Poison.GenerateCarros(10, p)
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 }
