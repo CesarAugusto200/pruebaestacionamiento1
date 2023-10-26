@@ -34,8 +34,8 @@ func (s *GameScene) Render() {
 }
 
 func (s *GameScene) StartGame() {
-	e := models.CreateEstacionamiento(3)
-	go Poison.GenerateCarros(10, e)
+	e := models.CreateEstacionamiento(20)
+	go Poison.GenerateCarros(100, e)
 	go s.PintarCarros(e)
 }
 

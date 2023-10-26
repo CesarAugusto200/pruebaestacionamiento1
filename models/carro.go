@@ -30,7 +30,7 @@ func (c *Carro) RunCarro() {
 		y := float32( rand.Intn(300-50+1) )
 		c.skin.Move(fyne.NewPos( x, y ))
 		fmt.Println("Carro ", c.I, " Entra")
-		time.Sleep(1 *time.Second)
+		time.Sleep(200 *time.Millisecond)
 	c.Estacionamiento.M.Unlock()
 
 	TiempoEsperar := rand.Intn(5-1+1) + 1
@@ -40,6 +40,6 @@ func (c *Carro) RunCarro() {
 		<- c.Estacionamiento.SlotsEstacionamiento
 		c.skin.Move(fyne.NewPos( 0,0 ))
 		fmt.Println("Carro ", c.I, " Sale")
-		time.Sleep(1 *time.Second)
+		time.Sleep(200 *time.Millisecond)
 	c.Estacionamiento.M.Unlock()
 }

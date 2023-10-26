@@ -23,7 +23,7 @@ func GenerateCarros(n int, estacionamiento *models.Estacionamiento) {
 
 		estacionamiento.PintarCarro <- carroImage
 		go nuevoCarro.RunCarro()
-		TiempoEsperar := rand.Intn(2-1+1) + 1
-		time.Sleep(time.Duration(TiempoEsperar) * time.Second)
+		TiempoEsperar := rand.Intn(700-100+1) + 1
+		time.Sleep(time.Duration(TiempoEsperar) * time.Millisecond)
 	}
 }
