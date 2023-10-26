@@ -7,7 +7,6 @@ import (
 )
 
 type Estacionamiento struct {
-	SlotsDisponibles     int
 	SlotsEstacionamiento chan bool
 	PintarCarro chan *canvas.Image
 
@@ -16,8 +15,7 @@ type Estacionamiento struct {
 
 func CreateEstacionamiento(nS int) *Estacionamiento {
 	return &Estacionamiento{
-		SlotsDisponibles:     nS,
-		SlotsEstacionamiento: make(chan bool, 1),
+		SlotsEstacionamiento: make(chan bool, nS+1),
 		PintarCarro: make(chan *canvas.Image, 1),
 	}
 }
