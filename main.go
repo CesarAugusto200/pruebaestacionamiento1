@@ -1,14 +1,20 @@
 package main
 
 import (
-	"jhsgja/models"
-	Poison "jhsgja/poision"
-	"time"
+	"jhsgja/scenes"
+
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
 )
 
 func main() {
-	p := models.CreateEstacionamiento(3)
-	Poison.GenerateCarros(10, p)
+	a := app.New()
+	w := a.NewWindow("Tux Revenge")
 
-	time.Sleep(30 * time.Second)
+	w.CenterOnScreen()
+	w.SetFixedSize(true)
+	w.Resize(fyne.NewSize(800, 600))
+	scenes.NewGameScene(w)
+	w.ShowAndRun()
 }
