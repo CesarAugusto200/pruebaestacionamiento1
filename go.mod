@@ -1,4 +1,4 @@
-module jhsgja
+module Simulator
 
 go 1.21.0
 
