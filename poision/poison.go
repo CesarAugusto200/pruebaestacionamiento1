@@ -1,74 +1,108 @@
 package Poison
 
 import (
-	"Simulator/models"
-	"math/rand"
-	"time"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/storage"
+    "Simulator/models"
+    "math/rand"
+    "time"
+    "fyne.io/fyne/v2"
+    "fyne.io/fyne/v2/canvas"
+    "fyne.io/fyne/v2/storage"
+    "sync"
 )
 
-type CoordenadasFyne struct {
-    X float32
-    Y float32
-}
+var entranceSemaphore = &sync.Mutex{}
 
-type CajonesEstacionamiento []bool
+func GenerateCarros(n int, estacionamiento *models.Estacionamiento) {
+    generatedCars := 0
 
-
-func GenerateCarros(coordenadasFyne []CoordenadasFyne, estacionamiento *models.Estacionamiento, cajones CajonesEstacionamiento) {
-    if estacionamiento.VehiculosEnEstacionamiento >= estacionamiento.Capacidad {
-        return
+    //  coordenadas de los espacios de estacionamiento
+    espaciosEstacionamiento := []fyne.Position{
+        fyne.NewPos(100, 100),
+        fyne.NewPos(200, 100),
+        fyne.NewPos(300, 100),
+        fyne.NewPos(400, 100),
+        fyne.NewPos(500, 100),
+        fyne.NewPos(600, 100),
+        fyne.NewPos(100, 200),
+        fyne.NewPos(200, 200),
+        fyne.NewPos(300, 200),
+        fyne.NewPos(400, 200),
+        fyne.NewPos(500, 200),
+        fyne.NewPos(600, 200),
+        fyne.NewPos(100, 300),
+        fyne.NewPos(200, 300),
+        fyne.NewPos(300, 300),
+        fyne.NewPos(400, 300),
+        fyne.NewPos(500, 300),
+        fyne.NewPos(600, 300),
+        fyne.NewPos(100, 400),
+        fyne.NewPos(200, 400),
+        fyne.NewPos(300, 400),
     }
 
-    <-estacionamiento.AccesoDisponible
+    for i := 0; i < n; i++ {
+        select {
+        case estacionamiento.SlotsEstacionamiento <- true:
+            entranceSemaphore.Lock()
+          
+            entranceSemaphore.Unlock()
 
-    totalCarros := len(coordenadasFyne)
-    for i := 0; i < 100; i++ {
-        coords := coordenadasFyne[i%totalCarros]
+        
+            carroImage := canvas.NewImageFromURI(storage.NewFileURI("./assets/Car.png"))
+            carroImage.Resize(fyne.NewSize(100, 100))
 
-        if estacionamiento.VehiculosEnEstacionamiento >= estacionamiento.Capacidad {
-            break
+           
+            carroImage.Move(espaciosEstacionamiento[i % len(espaciosEstacionamiento)])
+
+            nuevoCarro := models.CreateCarro(estacionamiento, carroImage)
+            nuevoCarro.I = generatedCars + 1
+
+            estacionamiento.PintarCarro <- carroImage
+            go nuevoCarro.RunCarro()
+
+            TiempoEsperar := rand.Intn(5000-1000+1) + 1000
+            time.Sleep(time.Duration(TiempoEsperar) * time.Millisecond)
+
+            generatedCars++
+        default:
+          
+            <-estacionamiento.VehiculosBloqueados
+            continue 
+        }
+    }
+}
+
+func GenerateCarsContinuously(estacionamiento *models.Estacionamiento) {
+    generatedCars := 0
+    for {
+        select {
+        case estacionamiento.SlotsEstacionamiento <- true:
+         
+            entranceSemaphore.Lock()
+         
+            entranceSemaphore.Unlock()
+        default:
+            
+            <-estacionamiento.VehiculosBloqueados
+            continue 
         }
 
         carroImage := canvas.NewImageFromURI(storage.NewFileURI("./assets/Car.png"))
         carroImage.Resize(fyne.NewSize(100, 100))
-        carroImage.Move(fyne.NewPos(coords.X, coords.Y))
+        x := float32(rand.Intn(700-100+1) + 1)
+        carroImage.Move(fyne.NewPos(x, 500))
 
         nuevoCarro := models.CreateCarro(estacionamiento, carroImage)
-        nuevoCarro.I = i + 1
+        nuevoCarro.I = generatedCars + 1
 
         estacionamiento.PintarCarro <- carroImage
         go nuevoCarro.RunCarro()
+        TiempoEsperar := rand.Intn(700-100+1) + 1
+        time.Sleep(time.Duration(TiempoEsperar) * time.Millisecond)
 
-        // Verifica si hay cajones de estacionamiento disponibles
-        cajonDisponible := -1
-        for j, ocupado := range cajones {
-            if !ocupado {
-                cajonDisponible = j
-                break
-            }
+        generatedCars++
+        if generatedCars >= 100 {
+            break
         }
-
-        if cajonDisponible != -1 {
-            // si encuentra un cajon disponible lo ocupa
-            cajones[cajonDisponible] = true
-
-            // El vehículo ocupara el cajan durante un tiempo aleatorio entre 1 y 5 segundos
-            tiempoOcupacion := rand.Intn(5-1+1) + 1
-            time.Sleep(time.Duration(tiempoOcupacion) * time.Second)
-
-            // Desocupa el cajón
-            cajones[cajonDisponible] = false
-        } else {
-			tiempoEspera := rand.Intn(5-1+1) + 1 
-			time.Sleep(time.Duration(tiempoEspera) * time.Second)
-        }
-
-        estacionamiento.VehiculosEnEstacionamiento++
     }
-
-    estacionamiento.AccesoDisponible <- struct{}{}
 }
-
