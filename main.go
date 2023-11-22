@@ -2,13 +2,15 @@ package main
 
 import (
 	"Simulator/scenes"
+
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 )
 
 func main() {
 	a := app.New()
-	w := a.NewWindow("Chiapas Smulation Parking")
+	w := a.NewWindow("Parking")
 
 	w.CenterOnScreen()
 	w.SetFixedSize(true)

@@ -13,7 +13,7 @@ import (
 
 type GameScene struct {
 	window fyne.Window
-	content        *fyne.Container
+	content *fyne.Container
 }
 
 func NewGameScene(window fyne.Window) *GameScene {
